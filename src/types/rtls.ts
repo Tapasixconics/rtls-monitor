@@ -1,0 +1,12 @@
+export type RoomType = "room" | "corridor";
+export type Point = { x: number; y: number };
+export type Bounds = Point & { width: number; height: number };
+export type Worker = { id: string; name: string; employeeId: string; tagId: string; beaconId: string; gatewayId: string };
+export type Device = { id: string; name: string; tagId: string; status: "Online" | "Offline"; battery: number };
+export type LocationPoint = Point & { timestamp: string };
+export type Room = { id: string; name: string; type: RoomType; bounds: Bounds; fill: string };
+export type MovementEvent = { roomId: string; roomName: string; timestamp: string };
+export type ConnectionStatus = "connected" | "reconnecting" | "disconnected";
+export type ActivityEvent = { id: string; timestamp: string; message: string; areaName: string; kind: "entered" | "exited" };
+export type NormalizedLocation = { workerId: string; tagId: string; beaconId: string; gatewayId: string; timestamp: string; x: number; y: number; signal: number; battery: number };
+export type Geofence = { id: string; name: string; type: RoomType; bounds: { xMin: number; xMax: number; yMin: number; yMax: number }; label: string };
