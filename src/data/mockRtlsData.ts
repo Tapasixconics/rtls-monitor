@@ -4,8 +4,6 @@ export const device: Device = { id: "TAG-001", name: "TAG-001", tagId: "TAG-001"
 export const rooms: Room[] = [
   { id: "R", name: "Room 1", type: "room", bounds: { x: 90, y: 85, width: 350, height: 195 }, fill: "#eef2f5" },
   { id: "VER", name: "Room 2", type: "room", bounds: { x: 440, y: 85, width: 470, height: 195 }, fill: "#eef2f5" },
-  { id: "K", name: "Kitchen", type: "room", bounds: { x: 90, y: 280, width: 150, height: 125 }, fill: "#eef2f5" },
-  { id: "T", name: "Toilet", type: "room", bounds: { x: 90, y: 405, width: 150, height: 100 }, fill: "#eef2f5" },
   { id: "C", name: "Corridor", type: "corridor", bounds: { x: 240, y: 280, width: 670, height: 225 }, fill: "#edf1f5" }
 ];
 export const locationSequence: LocationPoint[] = [
