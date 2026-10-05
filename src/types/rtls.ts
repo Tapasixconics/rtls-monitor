@@ -2,6 +2,7 @@ export type RoomType = "room" | "corridor";
 export type Point = { x: number; y: number };
 export type Bounds = Point & { width: number; height: number };
 export type Worker = { id: string; name: string; employeeId: string; tagId: string; beaconId: string; gatewayId: string };
+export type RoomEmployee = Worker & { roomId: string; status: Device["status"] };
 export type Device = { id: string; name: string; tagId: string; status: "Online" | "Offline"; battery: number };
 export type LocationPoint = Point & { timestamp: string };
 export type Room = { id: string; name: string; type: RoomType; bounds: Bounds; fill: string };

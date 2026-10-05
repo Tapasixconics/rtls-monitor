@@ -1,5 +1,10 @@
-import { Device, LocationPoint, Room, Worker } from "@/types/rtls";
+import { Device, LocationPoint, Room, RoomEmployee, Worker } from "@/types/rtls";
 export const worker: Worker = { id: "worker-001", name: "Rahul Kumar", employeeId: "WORKER-001", tagId: "TAG-001", beaconId: "BEACON-001", gatewayId: "GATEWAY-001" };
+export const roomEmployees: RoomEmployee[] = [
+  { ...worker, roomId: "R", status: "Online" },
+  { id: "worker-002", name: "Priya Sharma", employeeId: "WORKER-002", tagId: "TAG-002", beaconId: "BEACON-002", gatewayId: "GATEWAY-001", roomId: "R", status: "Online" },
+  { id: "worker-003", name: "Amit Verma", employeeId: "WORKER-003", tagId: "TAG-003", beaconId: "BEACON-003", gatewayId: "GATEWAY-001", roomId: "VER", status: "Online" }
+];
 export const device: Device = { id: "TAG-001", name: "TAG-001", tagId: "TAG-001", status: "Online", battery: 87 };
 export const rooms: Room[] = [
   { id: "R", name: "Room 1", type: "room", bounds: { x: 90, y: 85, width: 350, height: 195 }, fill: "#eef2f5" },
