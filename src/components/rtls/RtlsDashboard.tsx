@@ -85,29 +85,29 @@ export type GatewayHealth = {
   mac: string;
   name: string;
   shortName: string;
-  status: "online" | "lost" | "unseen";
+  status: "online" | "lost";
   lastSeen: number | null;
   rssi: number | null;
 };
 
 // Target positions inside Zone North matching the screenshot layout
 const NORTH_SLOTS = [
-  { x: 335, y: 182 },
-  { x: 352, y: 224 },
-  { x: 530, y: 168 },
-  { x: 260, y: 195 },
-  { x: 620, y: 205 },
-  { x: 420, y: 155 },
+  { x: 170, y: 180 },
+  { x: 250, y: 260 },
+  { x: 360, y: 160 },
+  { x: 150, y: 350 },
+  { x: 300, y: 420 },
+  { x: 410, y: 300 },
 ];
 
 // Target positions inside Zone South
 const SOUTH_SLOTS = [
-  { x: 420, y: 410 },
-  { x: 580, y: 430 },
-  { x: 330, y: 440 },
-  { x: 660, y: 400 },
-  { x: 490, y: 470 },
-  { x: 270, y: 390 },
+  { x: 610, y: 180 },
+  { x: 700, y: 260 },
+  { x: 840, y: 160 },
+  { x: 590, y: 350 },
+  { x: 760, y: 420 },
+  { x: 880, y: 300 },
 ];
 
 function resolveGateway(
@@ -192,8 +192,8 @@ function computeNonOverlappingPositions(
   if (group.length === 0) return [];
 
   const bounds = isSouthZone
-    ? { xMin: 95, xMax: 870, yMin: 335, yMax: 515 }
-    : { xMin: 95, xMax: 870, yMin: 85, yMax: 265 };
+    ? { xMin: 540, xMax: 910, yMin: 95, yMax: 515 }
+    : { xMin: 90, xMax: 460, yMin: 95, yMax: 515 };
 
   const slots = isSouthZone ? SOUTH_SLOTS : NORTH_SLOTS;
 
@@ -402,7 +402,7 @@ function RtlsMap({
           strokeOpacity="0.85"
         />
 
-        {/* Center Vertical Guideline */}
+        {/* Center Vertical Divider */}
         <line
           x1="500"
           y1="40"
@@ -421,8 +421,8 @@ function RtlsMap({
           <rect
             x="52"
             y="42"
-            width="896"
-            height="250"
+            width="440"
+            height="506"
             rx="4"
             fill="#091222"
             fillOpacity="0.75"
@@ -435,8 +435,6 @@ function RtlsMap({
             Zone North (Entrance)
           </text>
 
-          {/* Center Anchor Square */}
-          <rect x="496" y="186" width="7" height="7" fill="#475569" rx="1.5" />
         </g>
 
         {/* ========================================================= */}
@@ -445,10 +443,10 @@ function RtlsMap({
         <g id="zone-south">
           {/* Zone South Container Box with vibrant green border */}
           <rect
-            x="52"
-            y="300"
-            width="896"
-            height="250"
+            x="508"
+            y="42"
+            width="440"
+            height="506"
             rx="4"
             fill="#051918"
             fillOpacity="0.8"
@@ -457,12 +455,10 @@ function RtlsMap({
           />
 
           {/* Zone South Title */}
-          <text x="74" y="332" fill="#f8fafc" fontSize="16" fontWeight="700" letterSpacing="-0.01em">
+          <text x="530" y="74" fill="#f8fafc" fontSize="16" fontWeight="700" letterSpacing="-0.01em">
             Zone South (Workstations)
           </text>
 
-          {/* Center Anchor Square */}
-          <rect x="496" y="426" width="7" height="7" fill="#475569" rx="1.5" />
         </g>
 
         {/* ========================================================= */}
@@ -531,7 +527,6 @@ function RtlsMap({
                 }}
               >
                 {loc.employeeName || loc.employeeId}
-                {loc.isMidpoint ? " ⚡" : ""}
               </text>
 
               {/* RSSI Label with dark outline halo */}
@@ -575,7 +570,7 @@ export default function RtlsDashboard() {
       mac: NORTH_GW_MAC,
       name: GATEWAYS[NORTH_GW_MAC].name,
       shortName: GATEWAYS[NORTH_GW_MAC].shortName,
-      status: "unseen",
+      status: "online",
       lastSeen: null, // will be set on first real packet
       rssi: -58,
     },
@@ -583,7 +578,7 @@ export default function RtlsDashboard() {
       mac: SOUTH_GW_MAC,
       name: GATEWAYS[SOUTH_GW_MAC].name,
       shortName: GATEWAYS[SOUTH_GW_MAC].shortName,
-      status: "unseen",
+      status: "online",
       lastSeen: null, // will be set on first real packet
       rssi: -64,
     },
@@ -767,7 +762,7 @@ export default function RtlsDashboard() {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = Date.now();
-      const TIMEOUT_MS = 14000; // 14 seconds without packet = lost
+      const TIMEOUT_MS = 60000; // 60 seconds without packet = lost
 
       setGatewayStates((prev) => {
         let changed = false;
