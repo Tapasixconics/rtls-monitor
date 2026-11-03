@@ -575,7 +575,7 @@ export default function RtlsDashboard() {
       mac: NORTH_GW_MAC,
       name: GATEWAYS[NORTH_GW_MAC].name,
       shortName: GATEWAYS[NORTH_GW_MAC].shortName,
-      status: "online",
+      status: "unseen",
       lastSeen: null, // will be set on first real packet
       rssi: -58,
     },
@@ -583,7 +583,7 @@ export default function RtlsDashboard() {
       mac: SOUTH_GW_MAC,
       name: GATEWAYS[SOUTH_GW_MAC].name,
       shortName: GATEWAYS[SOUTH_GW_MAC].shortName,
-      status: "online",
+      status: "unseen",
       lastSeen: null, // will be set on first real packet
       rssi: -64,
     },
@@ -665,8 +665,8 @@ export default function RtlsDashboard() {
         setGatewayStates((prev) => {
           const next = { ...prev };
 
-          // Update North gateway heartbeat if rssiGw1 is present
-          if (update.rssiGw1 !== undefined) {
+          // Update North gateway heartbeat only when a valid RSSI is present.
+          if (typeof update.rssiGw1 === "number") {
             next[NORTH_GW_MAC] = {
               ...next[NORTH_GW_MAC],
               status: "online",
@@ -675,8 +675,8 @@ export default function RtlsDashboard() {
             };
           }
 
-          // Update South gateway heartbeat if rssiGw2 is present
-          if (update.rssiGw2 !== undefined) {
+          // Update South gateway heartbeat only when a valid RSSI is present.
+          if (typeof update.rssiGw2 === "number") {
             next[SOUTH_GW_MAC] = {
               ...next[SOUTH_GW_MAC],
               status: "online",
@@ -695,7 +695,7 @@ export default function RtlsDashboard() {
             (update.zone.toUpperCase().includes("SOUTH") ||
               update.zone.toUpperCase().includes("WORKSTATION"));
 
-          if (update.rssiGw2 === undefined && isExplicitSouth) {
+          if (typeof update.rssiGw2 !== "number" && isExplicitSouth) {
             // Tag is in South zone but rssiGw2 was omitted → South is alive
             next[SOUTH_GW_MAC] = {
               ...next[SOUTH_GW_MAC],
@@ -704,7 +704,7 @@ export default function RtlsDashboard() {
             };
           }
 
-          if (update.rssiGw1 === undefined) {
+          if (typeof update.rssiGw1 !== "number") {
             // Any packet at all keeps North alive (it bridges all BLE traffic)
             next[NORTH_GW_MAC] = {
               ...next[NORTH_GW_MAC],
@@ -808,7 +808,7 @@ export default function RtlsDashboard() {
     );
   }, [selectedLocation]);
 
-  const southGwLost = gatewayStates[SOUTH_GW_MAC]?.status === "lost";
+  const lostGateways = Object.values(gatewayStates).filter((gateway) => gateway.status === "lost");
 
   return (
     <div className="shell">
@@ -845,20 +845,26 @@ export default function RtlsDashboard() {
         </div>
       </header>
 
-      {/* Gateway Alert Banner if South Gateway signal drops */}
-      {southGwLost && (
+      {/* Gateway Alert Banner for any gateway whose telemetry has timed out */}
+      {lostGateways.length > 0 && (
         <div className="gw-alert-banner">
           <div>
-            <strong>⚠️ South Zone Gateway XC210864 (MAC: {formatMac(SOUTH_GW_MAC)}) Signal Lost</strong>
+            <strong>
+              ⚠️ Gateway signal lost: {lostGateways.map((gateway) => gateway.shortName).join(", ")}
+            </strong>
             <p>
-              No packets received from the South Gateway. ID cards in the South Zone may
-              intermittently link or fail over to the North Gateway. Please check South Gateway power
-              and network connectivity.
+              No valid telemetry has been received from the listed gateway(s) for 14 seconds. Employee
+              locations may be stale or fail over until telemetry resumes.
             </p>
           </div>
           <span className="gw-alert-meta">
-            Last seen{" "}
-            {Math.round((Date.now() - (gatewayStates[SOUTH_GW_MAC].lastSeen ?? 0)) / 1000)}s ago
+            {lostGateways
+              .map((gateway) =>
+                gateway.lastSeen
+                  ? `${gateway.shortName}: ${Math.round((Date.now() - gateway.lastSeen) / 1000)}s ago`
+                  : `${gateway.shortName}: no packets`
+              )
+              .join(" · ")}
           </span>
         </div>
       )}
