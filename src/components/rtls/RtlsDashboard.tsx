@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MovementEvent } from "@/types/rtls";
 import { roomEmployees as fallbackEmployees } from "@/data/mockRtlsData";
 
@@ -564,6 +564,7 @@ export default function RtlsDashboard() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [history, setHistory] = useState<MovementEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const monitoringStartedAt = useRef(Date.now());
 
   const [gatewayStates, setGatewayStates] = useState<Record<string, GatewayHealth>>({
     [NORTH_GW_MAC]: {
@@ -762,7 +763,7 @@ export default function RtlsDashboard() {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = Date.now();
-      const TIMEOUT_MS = 60000; // 60 seconds without packet = lost
+      const TIMEOUT_MS = 15000; // 15 seconds without packet = lost
 
       setGatewayStates((prev) => {
         let changed = false;
@@ -770,7 +771,8 @@ export default function RtlsDashboard() {
 
         for (const mac of [NORTH_GW_MAC, SOUTH_GW_MAC]) {
           const gw = next[mac];
-          if (gw.lastSeen && gw.status === "online" && now - gw.lastSeen > TIMEOUT_MS) {
+          const lastTelemetryAt = gw.lastSeen ?? monitoringStartedAt.current;
+          if (gw.status === "online" && now - lastTelemetryAt > TIMEOUT_MS) {
             next[mac] = { ...gw, status: "lost" };
             changed = true;
           }
@@ -848,7 +850,7 @@ export default function RtlsDashboard() {
               ⚠️ Gateway signal lost: {lostGateways.map((gateway) => gateway.shortName).join(", ")}
             </strong>
             <p>
-              No valid telemetry has been received from the listed gateway(s) for 14 seconds. Employee
+              No valid telemetry has been received from the listed gateway(s) for 15 seconds. Employee
               locations may be stale or fail over until telemetry resumes.
             </p>
           </div>
