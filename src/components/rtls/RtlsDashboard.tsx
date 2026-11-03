@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { MovementEvent } from "@/types/rtls";
 import { roomEmployees as fallbackEmployees } from "@/data/mockRtlsData";
 
-const API_BASE = process.env.NEXT_PUBLIC_RTLS_API_URL || "/api/ips";
+const CONFIGURED_API_BASE = (process.env.NEXT_PUBLIC_RTLS_API_URL || "/api/ips").replace(/\/+$/, "");
+
+function apiUrl(path: string): string {
+  const apiBase = /\/api(?:\/ips)?$/.test(CONFIGURED_API_BASE)
+    ? CONFIGURED_API_BASE
+    : `${CONFIGURED_API_BASE}/api`;
+  return `${apiBase}/${path.replace(/^\/+/, "")}`;
+}
 
 export const NORTH_GW_MAC = "FCE8C07E0214";
 export const SOUTH_GW_MAC = "FCE8C07D10D4";
@@ -585,7 +592,7 @@ export default function RtlsDashboard() {
   // Fetch initial employee list
   useEffect(() => {
     let alive = true;
-    fetch(`${API_BASE}/api/employees`)
+    fetch(apiUrl("employees"))
       .then((r) => r.json())
       .then((json) => {
         if (alive && json.status === "success") {
@@ -631,7 +638,7 @@ export default function RtlsDashboard() {
   useEffect(() => {
     let alive = true;
 
-    fetch(`${API_BASE}/api/locations?window=60`, { cache: "no-store" })
+    fetch(`${apiUrl("locations")}?window=60`, { cache: "no-store" })
       .then((r) => r.json())
       .then((json) => {
         if (alive && json.status === "success" && Array.isArray(json.data) && json.data.length > 0) {
@@ -642,7 +649,7 @@ export default function RtlsDashboard() {
         // live feed fallback already populated
       });
 
-    const source = new EventSource(`${API_BASE}/api/locations/stream`);
+    const source = new EventSource(apiUrl("locations/stream"));
 
     source.addEventListener("location", (event) => {
       try {
