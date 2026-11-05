@@ -999,18 +999,21 @@ export default function RtlsDashboard() {
                       borderRadius: "8px",
                       border: "1px solid #152238",
                       fontSize: "11px",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "12px",
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", color: "#64748b" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "4px", color: "#64748b" }}>
                       <span>Gateway</span>
                       <strong style={{ color: "#38bdf8" }}>{selectedLocation.gatewayName}</strong>
                     </div>
                     <div
                       style={{
                         display: "flex",
-                        justifyContent: "space-between",
+                        flexDirection: "column",
+                        gap: "4px",
                         color: "#64748b",
-                        marginTop: "6px",
                       }}
                     >
                       <span>Gateway MAC</span>
